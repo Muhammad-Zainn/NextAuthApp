@@ -1,18 +1,18 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-export default function page() {
-  type userType = {
-    email: string;
-    username: string;
-    password: string;
-  };
 
-  const [User, setUser] = useState<userType>({
+type UserType = {
+  email: string;
+  username: string;
+  password: string;
+};
+
+export default function Page() {
+  const [User, setUser] = useState<UserType>({
     email: "",
     password: "",
     username: "",
@@ -21,6 +21,7 @@ export default function page() {
   const [ButtonDisabled, setButtonDisabled] = useState(false);
   const [Loading, setLoading] = useState(false);
   const router = useRouter();
+
   const onSignup = async () => {
     try {
       setLoading(true);
@@ -28,18 +29,18 @@ export default function page() {
       console.log("SignUp Success", response.data);
       setUser({ email: "", username: "", password: "" });
       router.push("/login");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log("Sign Up Failed");
-      toast.error(error.message);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Something went wrong");
+      }
     }
   };
 
   useEffect(() => {
-    if (
-      User.email.length > 0 &&
-      User.password.length > 0 &&
-      User.username.length > 0
-    ) {
+    if (User.email && User.password && User.username) {
       setButtonDisabled(false);
     } else {
       setButtonDisabled(true);
@@ -104,11 +105,11 @@ export default function page() {
           onClick={onSignup}
           disabled={ButtonDisabled}
           className={`w-full py-3 rounded-lg font-semibold transition 
-        ${
-          ButtonDisabled
-            ? "bg-gray-600 text-gray-400 cursor-not-allowed"
-            : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg hover:shadow-xl"
-        }`}
+          ${
+            ButtonDisabled
+              ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+              : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg hover:shadow-xl"
+          }`}
         >
           {ButtonDisabled ? "Sign Up Disabled" : "Sign Up"}
         </button>

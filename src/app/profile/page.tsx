@@ -1,13 +1,14 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import Link from "next/link";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-export default function page() {
+
+export default function Page() {
   const router = useRouter();
   const [Data, setData] = useState("nothing");
+
   const getUserDetails = async () => {
     const response = await axios.post("/api/users/me");
     console.log(response.data);
@@ -19,11 +20,17 @@ export default function page() {
       await axios.get("/api/users/logout");
       toast.success("Logout Success");
       router.push("/login");
-    } catch (error: any) {
-      console.log(error.message);
-      toast.error(error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log(error.message);
+        toast.error(error.message);
+      } else {
+        console.log("An unexpected error occurred");
+        toast.error("An unexpected error occurred");
+      }
     }
   };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black px-4">
       <div className="w-full max-w-md bg-gray-900 rounded-2xl shadow-2xl p-8 border border-gray-700 text-center">

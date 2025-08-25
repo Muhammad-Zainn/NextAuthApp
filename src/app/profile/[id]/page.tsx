@@ -1,7 +1,19 @@
 import Link from "next/link";
 import React from "react";
+type PageProps = {
+  params: {
+    id: string;
+  };
+};
 
-export default function Page({ params }: any) {
+export async function generateMetadata({ params }: PageProps) {
+  return {
+    title: `Profile - ${params.id}`,
+    description: `This is the profile page for user ${params.id}.`,
+  };
+}
+
+export default function Page({ params }: PageProps) {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black px-4">
       <div className="w-full max-w-lg bg-gray-900 rounded-2xl shadow-2xl p-8 border border-gray-700 text-center">

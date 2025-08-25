@@ -1,17 +1,18 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-export default function page() {
-  type userType = {
+
+export default function ProfilePage() {
+  // ✅ capitalized unique name
+  type UserType = {
     email: string;
     password: string;
   };
 
-  const [User, setUser] = useState<userType>({
+  const [User, setUser] = useState<UserType>({
     email: "",
     password: "",
   });
@@ -19,25 +20,24 @@ export default function page() {
   const [ButtonDisabled, setButtonDisabled] = useState(false);
   const [Loading, setLoading] = useState(false);
   const router = useRouter();
+
   const onLogin = async () => {
     try {
       setLoading(true);
       const response = await axios.post("/api/users/login", User);
       console.log("Login Success", response.data);
       setUser({ email: "", password: "" });
-      router.push("/profile");
-    } catch (error: any) {
+      router.push("/");
+    } catch (error: unknown) {
+      // ✅ no "any"
+      const message = error instanceof Error ? error.message : String(error);
       console.log("Sign Up Failed");
-      toast.error(error.message);
+      toast.error(message);
     }
   };
 
   useEffect(() => {
-    if (User.email.length > 0 && User.password.length > 0) {
-      setButtonDisabled(false);
-    } else {
-      setButtonDisabled(true);
-    }
+    setButtonDisabled(!(User.email && User.password));
   }, [User]);
 
   return (
@@ -82,18 +82,18 @@ export default function page() {
           onClick={onLogin}
           disabled={ButtonDisabled}
           className={`w-full py-3 rounded-lg font-semibold transition 
-        ${
-          ButtonDisabled
-            ? "bg-gray-600 text-gray-400 cursor-not-allowed"
-            : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg hover:shadow-xl"
-        }`}
+            ${
+              ButtonDisabled
+                ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg hover:shadow-xl"
+            }`}
         >
           {ButtonDisabled ? "Login Disabled" : "Log In"}
         </button>
 
         {/* Extra Links */}
         <p className="text-center text-sm text-gray-400 mt-6">
-          Doesn't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link
             href="/signup"
             className="text-indigo-400 hover:underline font-medium"

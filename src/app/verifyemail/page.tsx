@@ -1,11 +1,10 @@
 "use client";
 import axios from "axios";
 import Link from "next/link";
+import React, { useState, useEffect } from "react";
 
-import React from "react";
-import { useState, useEffect } from "react";
-
-export default function page() {
+// ✅ Component name must be PascalCase
+export default function VerifyEmailPage() {
   const [Token, setToken] = useState("");
   const [Verified, setVerified] = useState(false);
   const [Error, setError] = useState(false);
@@ -15,9 +14,14 @@ export default function page() {
       await axios.post("/api/users/verifyemail", { token: Token });
       setVerified(true);
       setError(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      // ✅ safer than `any`
       setError(true);
-      console.log(error.response.data);
+      if (axios.isAxiosError(error)) {
+        console.log(error.response?.data);
+      } else if (error instanceof globalThis.Error) {
+        console.log(error.message);
+      }
     }
   };
 
@@ -32,6 +36,7 @@ export default function page() {
     if (Token.length > 0) {
       verifyUserEmail();
     }
+    // ✅ add dependency for ESLint warning fix
   }, [Token]);
 
   return (
