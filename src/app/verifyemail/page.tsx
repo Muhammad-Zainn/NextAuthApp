@@ -1,7 +1,7 @@
 "use client";
 import axios from "axios";
 import Link from "next/link";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 // ✅ Component name must be PascalCase
 export default function VerifyEmailPage() {
@@ -9,13 +9,12 @@ export default function VerifyEmailPage() {
   const [Verified, setVerified] = useState(false);
   const [Error, setError] = useState(false);
 
-  const verifyUserEmail = async () => {
+  const verifyUserEmail = useCallback(async () => {
     try {
       await axios.post("/api/users/verifyemail", { token: Token });
       setVerified(true);
       setError(false);
     } catch (error: unknown) {
-      // ✅ safer than `any`
       setError(true);
       if (axios.isAxiosError(error)) {
         console.log(error.response?.data);
@@ -23,7 +22,7 @@ export default function VerifyEmailPage() {
         console.log(error.message);
       }
     }
-  };
+  }, [Token]);
 
   useEffect(() => {
     setError(false);
@@ -36,9 +35,7 @@ export default function VerifyEmailPage() {
     if (Token.length > 0) {
       verifyUserEmail();
     }
-    // ✅ add dependency for ESLint warning fix
-  }, [Token]);
-
+  }, [Token, verifyUserEmail]);
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black px-4">
       <div className="w-full max-w-md bg-gray-900 rounded-2xl shadow-2xl p-8 border border-gray-700 text-center">

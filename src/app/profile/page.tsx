@@ -7,14 +7,26 @@ import { useRouter } from "next/navigation";
 
 export default function Page() {
   const router = useRouter();
-  const [Data, setData] = useState("nothing");
+  const [userId, setUserId] = useState<string | null>(null);
 
+  // ✅ Get user details
   const getUserDetails = async () => {
-    const response = await axios.post("/api/users/me");
-    console.log(response.data);
-    setData(response.data.data._id);
+    try {
+      const response = await axios.post("/api/users/me");
+      console.log(response.data);
+      setUserId(response.data.data._id); // store user ID
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error(error.message);
+        toast.error(error.message);
+      } else {
+        console.error("An unexpected error occurred");
+        toast.error("An unexpected error occurred");
+      }
+    }
   };
 
+  // ✅ Logout user
   const logout = async () => {
     try {
       await axios.get("/api/users/logout");
@@ -22,10 +34,10 @@ export default function Page() {
       router.push("/login");
     } catch (error: unknown) {
       if (error instanceof Error) {
-        console.log(error.message);
+        console.error(error.message);
         toast.error(error.message);
       } else {
-        console.log("An unexpected error occurred");
+        console.error("An unexpected error occurred");
         toast.error("An unexpected error occurred");
       }
     }
@@ -33,26 +45,24 @@ export default function Page() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black px-4">
-      <div className="w-full max-w-md bg-gray-900 rounded-2xl shadow-2xl p-8 border border-gray-700 text-center">
+      <div className="w-full max-w-lg bg-gray-900 rounded-2xl shadow-2xl p-8 border border-gray-700 text-center">
         {/* Heading */}
-        <h1 className="text-3xl font-bold text-white mb-4">Profile</h1>
+        <h1 className="text-3xl font-bold text-white mb-4">Profile Page</h1>
         <hr className="border-gray-700 mb-6" />
 
-        {/* Data Section */}
-        <div className="mb-6">
-          <h2 className="text-lg text-gray-300">
-            {Data === "nothing" ? (
-              <span className="italic text-gray-500">No data to display</span>
-            ) : (
-              <Link
-                href={`/profile/${Data}`}
-                className="text-blue-400 hover:text-blue-500 font-medium transition"
-              >
-                {Data}
-              </Link>
-            )}
-          </h2>
-        </div>
+        {/* User Info */}
+        {userId ? (
+          <div className="bg-gray-800 rounded-xl p-6 shadow-inner border border-gray-700 mb-6">
+            <h2 className="text-xl font-semibold text-blue-400 mb-2">
+              User ID
+            </h2>
+            <p className="text-gray-300 break-words">{userId}</p>
+          </div>
+        ) : (
+          <p className="text-gray-400 italic mb-6">
+            No user details loaded yet.
+          </p>
+        )}
 
         {/* Get User Details Button */}
         <button
@@ -69,6 +79,16 @@ export default function Page() {
         >
           Log Out
         </button>
+
+        {/* Back Button */}
+        <div className="mt-6">
+          <Link
+            href="/"
+            className="text-gray-400 hover:text-gray-200 text-sm transition"
+          >
+            ⬅ Back to Home
+          </Link>
+        </div>
       </div>
     </div>
   );
