@@ -12,6 +12,9 @@ export async function GET() {
 
     response.cookies.set("token", "", {
       httpOnly: true,
+      secure: true, // required on Vercel (HTTPS)
+      sameSite: "lax", // must match how it was set
+      path: "/",
       expires: new Date(0),
     });
 
