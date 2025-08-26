@@ -1,20 +1,29 @@
 "use client";
+
 import React, { useState } from "react";
 import axios from "axios";
 import Link from "next/link";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
+type User = {
+  _id: string;
+  email: string;
+  username: string;
+};
+
 export default function Page() {
   const router = useRouter();
-  const [userId, setUserId] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   // ✅ Get user details
   const getUserDetails = async () => {
     try {
       const response = await axios.post("/api/users/me");
       console.log(response.data);
-      setUserId(response.data.data._id); // store user ID
+
+      const { _id, email, username } = response.data.data;
+      setUser({ _id, email, username }); // store full user object
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error(error.message);
@@ -51,12 +60,20 @@ export default function Page() {
         <hr className="border-gray-700 mb-6" />
 
         {/* User Info */}
-        {userId ? (
-          <div className="bg-gray-800 rounded-xl p-6 shadow-inner border border-gray-700 mb-6">
-            <h2 className="text-xl font-semibold text-blue-400 mb-2">
-              User ID
-            </h2>
-            <p className="text-gray-300 break-words">{userId}</p>
+        {user ? (
+          <div className="bg-gray-800 rounded-xl p-6 shadow-inner border border-gray-700 mb-6 text-left space-y-4">
+            <div>
+              <h2 className="text-sm font-semibold text-gray-400">Username</h2>
+              <p className="text-gray-200">{user.username}</p>
+            </div>
+            <div>
+              <h2 className="text-sm font-semibold text-gray-400">Email</h2>
+              <p className="text-gray-200">{user.email}</p>
+            </div>
+            <div>
+              <h2 className="text-sm font-semibold text-gray-400">User ID</h2>
+              <p className="text-gray-200 break-words">{user._id}</p>
+            </div>
           </div>
         ) : (
           <p className="text-gray-400 italic mb-6">

@@ -2,7 +2,33 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { IoHomeOutline } from "react-icons/io5";
+import axios from "axios";
 const SectionHome = () => {
+  type User = {
+    _id: string;
+    email: string;
+    username: string;
+  };
+  const [user, setUser] = useState<User | null>(null);
+
+  // ✅ Fetch user details on load
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axios.post("/api/users/me");
+        setUser(response.data.data);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          console.error(error.message);
+        } else {
+          console.error("An unexpected error occurred");
+        }
+      }
+    };
+    fetchUser();
+  }, []);
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black text-white">
       {/* Navbar */}
@@ -11,15 +37,18 @@ const SectionHome = () => {
           AuthProject
         </h1>
         <div className="flex gap-6 text-gray-300">
-          <Link href="/" className="hover:text-blue-400 transition">
+          <Link
+            href="/"
+            className="hover:text-blue-400 group transition flex gap-1 items-center"
+          >
+            <IoHomeOutline className="text-white group-hover:text-blue-400" />
             Home
           </Link>
-          <Link href="/login" className="hover:text-blue-400 transition">
-            Login
-          </Link>
-          <Link href="/profile" className="hover:text-blue-400 transition">
-            Profile
-          </Link>
+          {user && (
+            <Link href="/profile" className="hover:text-blue-400 transition">
+              {user.username}
+            </Link>
+          )}
         </div>
       </nav>
 
@@ -107,11 +136,12 @@ const SectionHome = () => {
             </p>
           </div>
           <div className="flex gap-6 justify-center md:justify-end text-sm">
-            <Link href="/" className="hover:text-blue-400 transition">
+            <Link
+              href="/"
+              className="hover:text-blue-400 group transition flex gap-1 items-center "
+            >
+              <IoHomeOutline className="text-white group-hover:text-blue-400" />
               Home
-            </Link>
-            <Link href="/login" className="hover:text-blue-400 transition">
-              Login
             </Link>
             <Link href="/profile" className="hover:text-blue-400 transition">
               Profile
